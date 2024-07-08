@@ -25,7 +25,7 @@ export default {
 		if (await redis.get(visitTrackKey) != null) {
 			current = await redis.get(counterKey);
 		} else {
-			await redis.setex(visitTrackKey, 60 * 30, 1);
+			await redis.setex(visitTrackKey, 60 * 60, 1);
 			current = await redis.incr(counterKey);
 		}
 		return new Response(JSON.stringify({
