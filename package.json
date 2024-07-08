@@ -9,5 +9,8 @@
   },
   "devDependencies": {
     "wrangler": "^3.60.3"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.32.0"
   }
 }
