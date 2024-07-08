@@ -34,7 +34,8 @@ export default {
 			counter: current
 		}), {
 			headers: {
-				'Access-Control-Allow-Origin': env['CORS_DOMAIN']
+				'Access-Control-Allow-Origin': env['CORS_DOMAIN'],
+				'Cache-Control': 'no-cache'
 			}
 		});
 	}
