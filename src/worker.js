@@ -56,6 +56,12 @@ export default {
 				message: 'Access denied'
 			}));
 
+		if (key.length > 32)
+			return new Response(JSON.stringify({
+				code: 403,
+				message: 'Illegal post key'
+			}));
+
 		return await handleCounter(env, key, request);
 	}
 };
