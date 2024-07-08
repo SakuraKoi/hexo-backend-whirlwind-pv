@@ -4,4 +4,5 @@ compatibility_date = "2024-07-08"
 workers_dev = true
 
 [vars]
+CORS_DOMAIN = "https://blog.sakurakooi.dev"
 ACCESS_TOKEN = "You_should_delete_this_and_set_a_secret" # FIXME

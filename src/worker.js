@@ -32,6 +32,10 @@ export default {
 			code: 100,
 			message: 'ok',
 			counter: current
-		}));
+		}), {
+			headers: {
+				'Access-Control-Allow-Origin': env['CORS_DOMAIN']
+			}
+		});
 	}
 };
