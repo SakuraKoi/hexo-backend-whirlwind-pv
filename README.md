@@ -9,4 +9,5 @@
 ## How 2 Deploy
 
 1. https://developers.cloudflare.com/workers/databases/native-integrations/upstash/
-2. https://developers.cloudflare.com/workers/configuration/secrets/ `ACCESS_TOKEN`
+2. delete `vars.ACCESS_TOKEN` in `wrangler.toml`
+3. https://developers.cloudflare.com/workers/configuration/secrets/ `ACCESS_TOKEN`
