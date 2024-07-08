@@ -1,7 +1,46 @@
 import { Redis } from '@upstash/redis/cloudflare';
 
+async function handleCorsPreflight(env) {
+	return new Response(undefined, {
+		headers: {
+			'Access-Control-Allow-Origin': env['CORS_DOMAIN'],
+			'Access-Control-Allow-Headers': 'Sakura-Access-Token',
+		}
+	});
+}
+
+async function handleCounter(env, key, request) {
+	const redis = Redis.fromEnv(env);
+
+	let visitTrackKey = `t_${key}_${request.headers.get('CF-Connecting-IP')}`;
+	let counterKey = `c_${key}`;
+	let current;
+	if (await redis.get(visitTrackKey) != null) {
+		current = await redis.get(counterKey);
+	} else {
+		await redis.setex(visitTrackKey, 60 * 60, 1);
+		current = await redis.incr(counterKey);
+	}
+
+	return new Response(JSON.stringify({
+		code: 100,
+		message: 'ok',
+		counter: current
+	}), {
+		headers: {
+			'Access-Control-Allow-Origin': env['CORS_DOMAIN'],
+			'Access-Control-Allow-Headers': 'Sakura-Access-Token',
+			'Cache-Control': 'no-cache'
+		}
+	});
+}
+
 export default {
 	async fetch(request, env, ctx) {
+		if (request.method === 'OPTIONS') {
+			return await handleCorsPreflight(env);
+		}
+
 		const url = new URL(request.url);
 
 		let key = url.pathname.substring(1);
@@ -17,26 +56,6 @@ export default {
 				message: 'Access denied'
 			}));
 
-		const redis = Redis.fromEnv(env);
-
-		let visitTrackKey = `t_${key}_${request.headers.get('CF-Connecting-IP')}`;
-		let counterKey = `c_${key}`;
-		let current;
-		if (await redis.get(visitTrackKey) != null) {
-			current = await redis.get(counterKey);
-		} else {
-			await redis.setex(visitTrackKey, 60 * 60, 1);
-			current = await redis.incr(counterKey);
-		}
-		return new Response(JSON.stringify({
-			code: 100,
-			message: 'ok',
-			counter: current
-		}), {
-			headers: {
-				'Access-Control-Allow-Origin': env['CORS_DOMAIN'],
-				'Cache-Control': 'no-cache'
-			}
-		});
+		return await handleCounter(env, key, request);
 	}
 };
