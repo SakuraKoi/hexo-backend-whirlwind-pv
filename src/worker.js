@@ -9,13 +9,13 @@ async function handleCorsPreflight(env) {
 	});
 }
 
-async function handleCounter(env, key, request) {
+async function handleCounter(env, key, request, shouldIncrement) {
 	const redis = Redis.fromEnv(env);
 
 	let visitTrackKey = `t_${key}_${request.headers.get('CF-Connecting-IP')}`;
 	let counterKey = `c_${key}`;
 	let current;
-	if (await redis.get(visitTrackKey) != null) {
+	if (await redis.get(visitTrackKey) != null || !shouldIncrement) {
 		current = await redis.get(counterKey);
 	} else {
 		await redis.setex(visitTrackKey, 60 * 60, 1);
@@ -25,7 +25,7 @@ async function handleCounter(env, key, request) {
 	return new Response(JSON.stringify({
 		code: 100,
 		message: 'ok',
-		counter: current
+		counter: current ?? 0
 	}), {
 		headers: {
 			'Access-Control-Allow-Origin': env['CORS_DOMAIN'],
@@ -50,18 +50,18 @@ export default {
 				message: 'It\'s SakuraKooi\'s Blog PV counter here!'
 			}));
 
-		if (request.headers.get('Sakura-Access-Token') !== env['ACCESS_TOKEN'])
+		if (request.headers.get('Sakura-Access-Token') !== env['ACCESS_TOKEN'] || !request.headers.get('Counter-Action'))
 			return new Response(JSON.stringify({
 				code: 403,
 				message: 'Access denied'
 			}));
 
-		if (key.length > 32)
+		if (key.length > 40)
 			return new Response(JSON.stringify({
 				code: 403,
 				message: 'Illegal post key'
 			}));
 
-		return await handleCounter(env, key, request);
+		return await handleCounter(env, key, request, request.headers.get('Counter-Action') === "hit");
 	}
 };
