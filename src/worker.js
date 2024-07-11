@@ -4,7 +4,8 @@ async function handleCorsPreflight(env) {
 	return new Response(undefined, {
 		headers: {
 			'Access-Control-Allow-Origin': env['CORS_DOMAIN'],
-			'Access-Control-Allow-Headers': 'Sakura-Access-Token',
+			'Access-Control-Allow-Headers': 'Sakura-Access-Token, Counter-Action',
+			"Vary": "Origin",
 		}
 	});
 }
@@ -29,8 +30,8 @@ async function handleCounter(env, key, request, shouldIncrement) {
 	}), {
 		headers: {
 			'Access-Control-Allow-Origin': env['CORS_DOMAIN'],
-			'Access-Control-Allow-Headers': 'Sakura-Access-Token',
-			'Cache-Control': 'no-cache'
+			'Access-Control-Allow-Headers': 'Sakura-Access-Token, Counter-Action',
+			"Vary": "Origin",
 		}
 	});
 }
