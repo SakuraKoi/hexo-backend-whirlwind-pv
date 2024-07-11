@@ -32,6 +32,7 @@ async function handleCounter(env, key, request, shouldIncrement) {
 			'Access-Control-Allow-Origin': env['CORS_DOMAIN'],
 			'Access-Control-Allow-Headers': 'Sakura-Access-Token, Counter-Action',
 			"Vary": "Origin",
+			"Cache-Control": "private, max-age=3600, must-revalidate",
 		}
 	});
 }
